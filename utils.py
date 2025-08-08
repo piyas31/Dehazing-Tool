@@ -86,7 +86,7 @@ def recover_radiance(img, t, A, t0=0.1):
     J = np.clip(J, 0, 255).astype(np.uint8)
     return J
 
-# ---------- Full DCP pipeline ----------
+# ---------- Full DCP pipeline -----------
 def dehaze_dcp(img_bgr, omega=0.95, sz=15, guided_radius=40, guided_eps=1e-3, t0=0.1):
     """
     img_bgr: uint8 BGR (0-255)
