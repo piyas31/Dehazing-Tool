@@ -2,7 +2,7 @@ services:
   - type: web
     name: urban-fog-cleaner
     env: python
-    pythonVersion: 3.12.4
+    pythonVersion: 3.11.4
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
