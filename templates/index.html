@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Urban Fog Cleaner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg mt-10">
+    <h1 class="text-2xl font-bold mb-4 text-center">Urban Fog Cleaner (Dehazing Tool)</h1>
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-4">
+      <input type="file" name="image" accept="image/*" required class="block w-full border p-2 rounded" />
+
+      <div class="flex gap-4">
+        <label class="flex-1">
+          <span class="block text-sm font-medium">Method</span>
+          <select name="method" class="mt-1 block w-full border rounded p-2">
+            <option value="dcp" {% if method=='dcp' %}selected{% endif %}>DCP Dehazing (recommended)</option>
+            <option value="pipeline" {% if method=='pipeline' %}selected{% endif %}>Edge/Hist Pipeline</option>
+          </select>
+        </label>
+      </div>
+
+     <div class="p-3 border rounded space-y-4">
+  <h3 class="font-semibold mb-2">DCP Parameters</h3>
+
+  <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
+    <label class="flex-1">
+      omega (strength):
+      <input type="number" step="0.01" name="omega" value="{{ request.form.get('omega', '0.95') }}" class="border p-1 rounded w-full md:w-auto" />
+    </label>
+    <label class="flex-1">
+      patch size:
+      <input type="number" name="patch" value="{{ request.form.get('patch', '15') }}" class="border p-1 rounded w-full md:w-auto" />
+    </label>
+  </div>
+  <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
+    <label class="flex-1">
+      guided radius:
+      <input type="number" name="guided_r" value="{{ request.form.get('guided_r', '40') }}" class="border p-1 rounded w-full md:w-auto" />
+    </label>
+    <label class="flex-1">
+      guided eps:
+      <input type="number" step="1e-4" name="guided_eps" value="{{ request.form.get('guided_eps', '0.001') }}" class="border p-1 rounded w-full md:w-auto" />
+    </label>
+  </div>
+  <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
+    <label class="flex-1">
+      t0 (min transmission):
+      <input type="number" step="0.01" name="t0" value="{{ request.form.get('t0', '0.1') }}" class="border p-1 rounded w-full md:w-auto" />
+    </label>
+  </div>
+</div>
+
+
+
+
+      <div class="p-3 border rounded space-y-2">
+        <label class="flex items-center space-x-2"><input type="checkbox" name="freq" {% if request.form.get('freq')=='on' %}checked{% else %}checked{% endif %}> <span>Frequency Enhance</span></label>
+        <label>Amount: <input type="number" step="0.1" name="freq_amt" value="{{ request.form.get('freq_amt', '1.0') }}" class="border p-1 rounded w-20"></label>
+        <label class="flex items-center space-x-2"><input type="checkbox" name="hist" {% if request.form.get('hist')=='on' %}checked{% else %}checked{% endif %}> <span>Histogram Stretch</span></label>
+        <label class="flex items-center space-x-2"><input type="checkbox" name="adapt" {% if request.form.get('adapt')=='on' %}checked{% else %}checked{% endif %}> <span>Adaptive Smooth & Sharpen</span></label>
+        <label>Sigma: <input type="number" step="0.1" name="adapt_sigma" value="{{ request.form.get('adapt_sigma', '1.0') }}" class="border p-1 rounded w-20"></label>
+        <label>Sharp: <input type="number" step="0.1" name="adapt_sharp" value="{{ request.form.get('adapt_sharp', '1.0') }}" class="border p-1 rounded w-20"></label>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Process Image</button>
+
+        {% if original_image and processed_image %}
+        <button type="button" onclick="closeBothImages()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Close ×</button>
+        {% endif %}
+      </div>
+    </form>
+
+    {% if original_image and processed_image %}
+      <div id="image-wrapper" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+
+
+        <div class="relative bg-white rounded shadow p-3">
+          <h2 class="text-lg font-semibold mb-2 text-center">Original Image:</h2>
+          <img src="{{ original_image }}" alt="Original" class="rounded shadow max-w-full mx-auto" />
+        </div>
+
+        <div class="relative bg-white rounded shadow p-3">
+          <h2 class="text-lg font-semibold mb-2 text-center">Processed Image:</h2>
+          <img src="{{ processed_image }}" alt="Processed" class="rounded shadow max-w-full mx-auto" />
+          <a href="{{ processed_image }}" download class="inline-block mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Download</a>
+        </div>
+
+      </div>
+    {% endif %}
+
+  </div>
+
+ <script>
+  function closeBothImages() {
+    const wrapper = document.getElementById('image-wrapper');
+    if(wrapper) wrapper.remove();
+    window.location.href = "/";
+  }
+</script>
+
+</body>
+</html>
