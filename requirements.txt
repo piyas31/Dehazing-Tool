@@ -4,4 +4,3 @@ opencv-python==4.8.0.74
 scipy>=1.10.0,<1.12.0
 Pillow==10.1.0
 matplotlib==3.8.1
-gunicorn
